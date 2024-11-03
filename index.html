@@ -156,7 +156,7 @@
       };
 
       html5QrCode
-        .start({ facingMode: "environtment" }, config, qrCodeSuccessCallback)
+        .start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
         .catch((err) => {
           console.error("Error starting QR scanner:", err);
           showStatus(
