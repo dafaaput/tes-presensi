@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Presensi QR Code Asatidzah RTQ Al Furqon Nguter</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="scanner-container">
+      <h2>Presensi QR Code</h2>
+      <div id="reader"></div>
+      <div id="status"></div>
+    </div>
+
+    <div class="table-container">
+      <h2>Hasil Presensi</h2>
+      <div class="scrollable-table">
+        <table id="presensiTable">
+          <thead>
+            <tr>
+              <th>Hari</th>
+              <th>Tanggal</th>
+              <th>Nama</th>
+              <th>Jam</th>
+              <th>Keterangan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data rows will be inserted here dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"
+      integrity="sha512-r6rDA7W6ZeQhvl8S7yRVQUKVHdexq+GAlNkNNqVC7YyIV+NwqCTJe2hDWCiffTyRNOeGEzRRJ9ifvRm/HCzGYg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script>
+      const html5QrCode = new Html5Qrcode("reader");
+
+      // Data ustadz/ustadzah
+      const ustadz = [
+        "Dafa Putra Rabbani",
+        "Art Tyas Fattah Pradhipta",
+        "Marganus Satya Negara",
+        "Abdul Muiz",
+        "Ibrahim",
+      ];
+
+      const ustadzah = [
+        "Afifah Aslam Izzati",
+        "Bekti Wulandari",
+        "Darsih",
+        "Desinta",
+        "Isna Choiriyah",
+        "Laras Budyaningrum",
+        "Nurjanah",
+        "Shofi",
+      ];
+
+      function saveToLocalStorage(data) {
+        let presensiData =
+          JSON.parse(localStorage.getItem("presensiData")) || [];
+        presensiData.push(data);
+        localStorage.setItem("presensiData", JSON.stringify(presensiData));
+        addRowToTable(data);
+      }
+
+      function addRowToTable(data) {
+        const tableBody = document
+          .getElementById("presensiTable")
+          .querySelector("tbody");
+        const row = document.createElement("tr");
+
+        for (const key in data) {
+          const cell = document.createElement("td");
+          cell.textContent = data[key];
+          row.appendChild(cell);
+        }
+
+        tableBody.appendChild(row);
+      }
+
+      function showStatus(message, isError = false) {
+        const statusDiv = document.getElementById("status");
+        statusDiv.className = `status ${isError ? "error" : "success"}`;
+        statusDiv.textContent = message;
+        console.log(`${isError ? "Error" : "Success"}: ${message}`);
+      }
+
+      const qrCodeSuccessCallback = async (decodedText, decodedResult) => {
+        try {
+          const [name, role, status] = decodedText.split("-");
+          console.log("Parsed QR:", { name, role, status });
+
+          if (!name || !role || !status) {
+            throw new Error("Format QR code tidak valid");
+          }
+
+          let isValid = false;
+          if (role === "Ustadz" && ustadz.includes(name)) {
+            isValid = true;
+          } else if (role === "Ustadzah" && ustadzah.includes(name)) {
+            isValid = true;
+          }
+
+          if (!isValid) {
+            throw new Error("Nama atau peran tidak sesuai");
+          }
+
+          const now = new Date();
+          const formattedDate = `${now.getDate()} ${new Intl.DateTimeFormat(
+            "id-ID",
+            {
+              month: "long",
+            }
+          ).format(now)} ${now.getFullYear()}`;
+          const data = {
+            hari: new Intl.DateTimeFormat("id-ID", { weekday: "long" }).format(
+              now
+            ),
+            tanggal: formattedDate,
+            nama: name,
+            jam:
+              now.toLocaleTimeString("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+              }) + " WIB",
+            keterangan: status,
+          };
+
+          console.log("Saving data to local storage:", data);
+
+          saveToLocalStorage(data);
+          showStatus(`Presensi berhasil dicatat untuk ${name}`);
+
+          await html5QrCode.pause(true);
+          setTimeout(() => {
+            html5QrCode.resume();
+            showStatus("Scanner siap digunakan kembali");
+          }, 3000);
+        } catch (error) {
+          console.error("Error:", error);
+          showStatus(error.message, true);
+        }
+      };
+
+      const config = {
+        fps: 30,
+        qrbox: { width: 200, height: 200 },
+        aspectRatio: 1.0,
+      };
+
+      html5QrCode
+        .start({ facingMode: "user" }, config, qrCodeSuccessCallback)
+        .catch((err) => {
+          console.error("Error starting QR scanner:", err);
+          showStatus(
+            "Gagal memulai scanner QR. Pastikan kamera diizinkan.",
+            true
+          );
+        });
+
+      window.onload = function () {
+        const presensiData =
+          JSON.parse(localStorage.getItem("presensiData")) || [];
+        presensiData.forEach(addRowToTable);
+      };
+    </script>
+  </body>
+</html>

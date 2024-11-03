@@ -1,0 +1,165 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  width: 100%;
+  margin: 0 auto;
+  padding: clamp(10px, 3vw, 20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 2vw, 20px);
+  overflow-x: hidden;
+}
+
+h2 {
+  margin: 0 0 clamp(12px, 2vw, 16px) 0;
+  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+  color: #333;
+  text-align: center;
+}
+
+#scanner-container,
+.table-container {
+  width: 100%;
+  max-width: 100%;
+  background-color: #f8f9fa;
+  padding: clamp(12px, 2vw, 16px);
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: clamp(12px, 2vw, 16px);
+}
+
+#reader {
+  width: 100%;
+  max-width: min(400px, 90vw);
+  height: auto;
+  border-radius: 8px;
+  margin: 0 auto;
+}
+
+.status {
+  padding: clamp(8px, 1.5vw, 10px);
+  margin: clamp(10px, 2vw, 15px) 0;
+  border-radius: 4px;
+  width: 100%;
+  font-size: clamp(0.85rem, 1.5vw, 0.9rem);
+  text-align: center;
+}
+
+.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Table Styles */
+.table-container {
+  overflow: hidden;
+  width: 100%;
+}
+
+.scrollable-table {
+  max-height: 60vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+}
+
+th,
+td {
+  padding: clamp(6px, 1.5vw, 12px) clamp(4px, 1vw, 8px);
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  word-wrap: break-word;
+}
+
+th {
+  background-color: #e9ecef;
+  color: #333;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+@media (min-width: 1024px) {
+  body {
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  #scanner-container,
+  .table-container {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  body {
+    padding: 15px;
+  }
+
+  #scanner-container,
+  .table-container {
+    max-width: 90%;
+  }
+
+  #reader {
+    max-width: 80%;
+  }
+}
+
+@media (max-width: 767px) {
+  body {
+    padding: 10px;
+  }
+
+  #scanner-container,
+  .table-container {
+    max-width: 100%;
+  }
+
+  #reader {
+    max-width: 50%;
+  }
+
+  table {
+    font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+  }
+}
+
+/* Touch Device Optimization */
+@media (hover: none) {
+  .scrollable-table {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  th,
+  td {
+    padding: clamp(8px, 2vw, 12px) clamp(6px, 1.5vw, 8px);
+  }
+}
